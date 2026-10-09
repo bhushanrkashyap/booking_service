@@ -2,6 +2,7 @@ package com.example.booking_service.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -69,6 +70,16 @@ public class GlobalExceptionHandler {
         log.warn("Unauthorized booking access: {}", ex.getMessage());
         ErrorResponse error = new ErrorResponse("Unauthorized access", "UNAUTHORIZED", ex.getMessage());
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
+            DataIntegrityViolationException ex, WebRequest request) {
+        log.warn("Booking conflicted with a concurrent update: {}", ex.getMessage());
+        ErrorResponse error = new ErrorResponse(
+                "Booking conflict", "BOOKING_CONFLICT",
+                "This booking conflicted with a concurrent update. Please retry.");
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

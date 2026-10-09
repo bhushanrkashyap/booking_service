@@ -157,6 +157,15 @@ public class BookingService {
                     + seatHoldService.holdTtl().toMinutes() + " minutes or the hold will be released.");
 
             return response;
+        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
+            // BookingController retries this specific race once (lost schedule-row
+            // creation, or a PNR pre-check collision) and the retry commonly
+            // succeeds. Don't publish a failure event here - if we did, a booking
+            // that the user experiences as a single success would also emit a
+            // BookingFailedEvent. If the retry fails too, it reaches this same
+            // catch again and still won't publish; GlobalExceptionHandler reports
+            // the final outcome to the caller instead.
+            throw ex;
         } catch (RuntimeException ex) {
             eventPublisher.publishBookingFailed(
                     resolveUserId(authentication), authentication.getName(),
