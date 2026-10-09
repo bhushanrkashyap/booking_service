@@ -1,0 +1,47 @@
+package com.example.booking_service.Controller;
+
+import com.example.booking_service.DTO.SeatAvailabilityResponseDTO;
+import com.example.booking_service.DTO.TrainResponseDTO;
+import com.example.booking_service.DTO.TrainSearchResultDTO;
+import com.example.booking_service.Service.TrainService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+
+@RestController
+@RequestMapping("/api/trains")
+public class TrainController {
+    private final TrainService trainService;
+
+    public TrainController(TrainService trainService) {
+        this.trainService = trainService;
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<TrainSearchResultDTO>> searchTrains(
+            @RequestParam(required = false) String source,
+            @RequestParam(required = false) String destination,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate journeyDate,
+            @RequestParam(required = false) Integer trainNumber,
+            @PageableDefault(size = 20) Pageable pageable) {
+
+        return ResponseEntity.ok(trainService.searchTrains(source, destination, journeyDate, trainNumber, pageable));
+    }
+
+    @GetMapping("/{trainId}")
+    public ResponseEntity<TrainResponseDTO> getTrainById(@PathVariable Long trainId) {
+        return ResponseEntity.ok(trainService.getTrainById(trainId));
+    }
+
+    @GetMapping("/{trainId}/availability")
+    public ResponseEntity<SeatAvailabilityResponseDTO> getSeatAvailability(
+            @PathVariable Long trainId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate journeyDate) {
+        return ResponseEntity.ok(trainService.getSeatAvailability(trainId, journeyDate));
+    }
+}
