@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+.vscode
+*.iml
+*.iws
+*.ipr
+*.classpath
+*.project
+*.settings
+*.factorypath
+
+# Build output
+target/
+*.jar
+*.war
+*.ear
+*.class
+
+# Logs
+*.log
+logs/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# OS junk
+.DS_Store
+Thumbs.db
+__MACOSX/
+._*
+
+# Maven wrapper downloads
+.mvn/wrapper/*.jar
+
+# Docs that are not needed inside the image
+HELP.md
+README.md
